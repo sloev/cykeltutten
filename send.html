@@ -31,7 +31,7 @@ iframe.src = `https://vdo.ninja/?push=${bikeId}&wc&ns&as&q=1&m&noap&facing=front
         const room = joinRoom(config, 'cykeltutten_2023')
         console.log(room)
         const [sendGps, getGps] = room.makeAction('locations')
-        var location = { latitude: 55.0579645, longitude: 10.6174116 }
+        var location = { latitude: 55.0579615, longitude: 10.6174136 }
 
         function transmitLocation() {
             sendGps(location)
