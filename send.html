@@ -1,0 +1,100 @@
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+
+<body>
+    <iframe allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;midi;geolocation;"
+        src="https://vdo.ninja/?push=cykeltutten_1&wc&ns&as&q=1&m&noap&facing=front"></iframe>
+    <script type="module">
+        import { joinRoom } from 'https://cdn.skypack.dev/trystero'
+
+
+        
+
+        const config = { appId: 'cykeltutten_2023' }
+        const room = joinRoom(config, 'cykeltutten_2023')
+        console.log(room)
+        const [sendGps, getGps] = room.makeAction('locations')
+        var location = { latitude: 55.0579645, longitude: 10.6174116 }
+
+        function transmitLocation() {
+            sendGps(location)
+            window.setTimeout(transmitLocation, 1000,); // p
+        }
+        window.setTimeout(transmitLocation, 1000,); // p
+
+
+        function setLocation(pos) {
+            const crd = pos.coords;
+            console.log(crd.latitude, crd.longitude)
+            location = { latitude: crd.latitude, longitude: crd.longitude }
+
+
+        }
+
+        function error(err) {
+            console.error(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        const options = {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 0,
+        };
+
+        const id = navigator.geolocation.watchPosition(transmitLocation, error, options);
+
+
+
+        // // buy drink for a friend
+        // var bounds = new mapboxgl.LngLatBounds();
+
+        // markers.features.forEach(function (feature) {
+        //     bounds.extend(feature.geometry.coordinates);
+        // });
+
+        // map.fitBounds(bounds);
+        const markers = {}
+
+
+        // listen for drinks sent to you
+        getGps((data, peerId) => {
+            const marker = new mapboxgl.Marker()
+                .setLngLat([data.longitude, data.latitude])
+                .addTo(map);
+            markers[peerId] = marker
+
+            window.setTimeout(() => {
+                marker.remove();
+                delete markers[peerId];
+            }, 10000,); // pass mymarker as parameter to removeMarker()
+
+
+            var bounds = new mapboxgl.LngLatBounds();
+
+            for (const [key, value] of Object.entries(markers)) {
+                const lnglat = marker.getLngLat()
+                bounds.extend(lnglat);
+
+            }
+
+            map.fitBounds(bounds);
+            console.log(
+                `got a gps coordinate: lat:${data.latitude}, lon:${data.longitude}  from ${peerId}`
+            )
+        })
+
+    </script>
+</body>

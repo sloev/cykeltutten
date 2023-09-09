@@ -1,0 +1,91 @@
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+
+<body>
+    <div id="map"></div>
+    <script type="module">
+        import { joinRoom } from 'https://cdn.skypack.dev/trystero'
+
+        var map = new mapboxgl.Map({
+            container: 'map', // HTML container id
+            style: 'mapbox://styles/mapbox/streets-v9', // style URL
+            center: [10.6174116, 55.0579645], // starting position as [lng, lat]
+            zoom: 13,
+            maxZoom: 15,
+
+            accessToken: 'pk.eyJ1IjoidmFsYmpvcm5qb2hhbm5lcyIsImEiOiJja3Ewc3FkcGEwMWZrMnVucjNlcGh0Y2toIn0.7Lpvay_SJFjbez4ODpHrHw'
+        });
+
+        const config = { appId: 'cykeltutten_2023' }
+        const room = joinRoom(config, 'cykeltutten_2023')
+        console.log(room)
+        const [sendGps, getGps] = room.makeAction('locations')
+
+
+
+        function error(err) {
+            console.error(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        const options = {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 0,
+        };
+
+
+
+
+        // // buy drink for a friend
+        // var bounds = new mapboxgl.LngLatBounds();
+
+        // markers.features.forEach(function (feature) {
+        //     bounds.extend(feature.geometry.coordinates);
+        // });
+
+        // map.fitBounds(bounds);
+        const markers = {}
+
+
+        // listen for drinks sent to you
+        getGps((data, peerId) => {
+            const marker = new mapboxgl.Marker()
+                .setLngLat([data.longitude, data.latitude])
+                .addTo(map);
+            markers[peerId] = marker
+
+            window.setTimeout(() => {
+                marker.remove();
+                delete markers[peerId];
+            }, 10000,); // pass mymarker as parameter to removeMarker()
+
+
+            var bounds = new mapboxgl.LngLatBounds();
+
+            for (const [key, value] of Object.entries(markers)) {
+                const lnglat = marker.getLngLat()
+                bounds.extend(lnglat);
+
+            }
+
+            map.fitBounds(bounds);
+            console.log(
+                `got a gps coordinate: lat:${data.latitude}, lon:${data.longitude}  from ${peerId}`
+            )
+        })
+
+    </script>
+</body>

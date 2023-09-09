@@ -1,0 +1,27 @@
+
+
+<script>
+    
+function success(pos) {
+  const crd = pos.coords;
+  console.log(crd.latitude, crd.longitude)
+  
+}
+
+function error(err) {
+  console.error(`ERROR(${err.code}): ${err.message}`);
+}
+
+target = {
+  latitude: 0,
+  longitude: 0,
+};
+
+options = {
+  enableHighAccuracy: false,
+  timeout: 5000,
+  maximumAge: 0,
+};
+
+id = navigator.geolocation.watchPosition(success, error, options);
+</script>
