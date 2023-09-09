@@ -18,7 +18,18 @@
     <div id="map"></div>
     <script type="module">
         import { joinRoom } from 'https://cdn.skypack.dev/trystero'
-
+        const stringToColour = (str) => {
+            let hash = 0;
+            str.split('').forEach(char => {
+                hash = char.charCodeAt(0) + ((hash << 5) - hash)
+            })
+            let colour = '#'
+            for (let i = 0; i < 3; i++) {
+                const value = (hash >> (i * 8)) & 0xff
+                colour += value.toString(16).padStart(2, '0')
+            }
+            return colour
+        }
         var map = new mapboxgl.Map({
             container: 'map', // HTML container id
             style: 'mapbox://styles/mapbox/streets-v9', // style URL
@@ -62,9 +73,19 @@
 
         // listen for drinks sent to you
         getGps((data, peerId) => {
-            const marker = new mapboxgl.Marker()
-                .setLngLat([data.longitude, data.latitude])
-                .addTo(map);
+            var marker = markers[peerId]
+            if (!marker) {
+                console.log("add marker", data)
+
+                marker = new mapboxgl.Marker({ "color": stringToColour(peerId) })
+                    .setLngLat([data.longitude, data.latitude])
+                    .addTo(map);
+            } else {
+                console.log("update marker", data)
+                marker.setLngLat([data.longitude, data.latitude])
+            }
+
+
             markers[peerId] = marker
 
             window.setTimeout(() => {
