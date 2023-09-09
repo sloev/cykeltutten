@@ -16,6 +16,9 @@
 
 <body>
    <iframe id="vdo" allow="autoplay;camera;microphone;fullscreen;picture-in-picture;display-capture;midi;geolocation;"></iframe>
+   <div id="location"></div>
+   <div id="date"></div>
+
     <script type="module">
         import { joinRoom } from 'https://cdn.skypack.dev/trystero'
         const urlParams = new URLSearchParams(window.location.search);
@@ -32,15 +35,21 @@ iframe.src = `https://vdo.ninja/?push=${bikeId}&wc&ns&as&q=1&m&noap&facing=front
 
         function transmitLocation() {
             sendGps(location)
+           
             window.setTimeout(transmitLocation, 1000,); // p
         }
         window.setTimeout(transmitLocation, 1000,); // p
 
 
         function setLocation(pos) {
+
             const crd = pos.coords;
             console.log(crd.latitude, crd.longitude)
-            location = { latitude: crd.latitude, longitude: crd.longitude }
+            location.latitude= crd.latitude
+            location.longitude= crd.longitude
+            document.getElementById("location").innerHTML = JSON.stringify(location);
+            document.getElementById("date").innerHTML = JSON.stringify(new Date());
+
 
 
         }
