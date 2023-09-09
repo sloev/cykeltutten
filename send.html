@@ -64,7 +64,7 @@ iframe.src = `https://vdo.ninja/?push=${bikeId}&wc&ns&as&q=1&m&noap&facing=front
             maximumAge: 0,
         };
 
-        const id = navigator.geolocation.watchPosition(transmitLocation, error, options);
+        const id = navigator.geolocation.watchPosition(setLocation, error, options);
 
 
 
